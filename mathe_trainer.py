@@ -4,74 +4,178 @@ import random
 # --- Konfiguration der Seite ---
 st.set_page_config(page_title="IU Mathe-Trainer", page_icon="🎓")
 
-# --- Die Fragen-Datenbank (Deine Fragen aus den Skripten) ---
-FRAGEN_DB = [
-    # --- KAPITEL 1: Grundlagen ---
-    {
-        "frage": "Kapitel 1: Welche Zahlenmenge wird mit dem Symbol Z bezeichnet?",
-        "optionen": ["Natürliche Zahlen", "Ganze Zahlen", "Rationale Zahlen", "Reelle Zahlen"],
-        "antwort": 1
-    },
-    {
-        "frage": "Kapitel 1: Welche Form muss eine quadratische Gleichung haben, um die p-q-Formel anzuwenden?",
-        "optionen": ["ax^2 + bx + c = 0", "x^2 + px + q = 0", "a^2 + b^2 = c^2", "y = mx + n"],
-        "antwort": 1
-    },
-    # --- KAPITEL 2: Funktionen ---
-    {
-        "frage": "Kapitel 2: Wie verhalten sich die Graphen einer Funktion und ihrer Umkehrfunktion zueinander?",
-        "optionen": ["Punktsymmetrisch zum Ursprung", "Sie sind identisch", "Spiegelsymmetrisch zur Geraden y = x", "Sie schneiden sich nie"],
-        "antwort": 2
-    },
-    {
-        "frage": "Kapitel 2: Was ergibt log(a * b)?",
-        "optionen": ["log(a) * log(b)", "log(a) + log(b)", "log(a) - log(b)", "b * log(a)"],
-        "antwort": 1
-    },
-    # --- KAPITEL 3: Differentialrechnung I ---
-    {
-        "frage": "Kapitel 3: Wie lautet die Kettenregel für f(x) = g(h(x))?",
-        "optionen": ["f'(x) = g'(h(x)) * h'(x)", "f'(x) = g'(x) * h'(x)", "f'(x) = g'(h(x)) + h'(x)", "f'(x) = g(h'(x))"],
-        "antwort": 0
-    },
-    {
-        "frage": "Kapitel 3: Welche Bedingungen müssen für ein lokales Maximum bei x0 erfüllt sein?",
-        "optionen": ["f'(x0) = 0 und f''(x0) > 0", "f'(x0) > 0 und f''(x0) = 0", "f'(x0) = 0 und f''(x0) < 0", "f'(x0) = 0 und f''(x0) = 0"],
-        "antwort": 2
-    },
-    # --- KAPITEL 4: Ökonomische Anwendungen ---
-    {
-        "frage": "Kapitel 4: Wann spricht man von einer unelastischen Nachfrage?",
-        "optionen": ["Wenn |epsilon| > 1", "Wenn |epsilon| = 1", "Wenn |epsilon| < 1", "Wenn epsilon = 0"],
-        "antwort": 2
-    },
-    {
-        "frage": "Kapitel 4: Was bedeutet 'Grenzkosten = Grenzerlöse' (MC = MR)?",
-        "optionen": ["Kostenminimierung", "Gewinnmaximierung im Monopol", "Umsatzmaximierung", "Break-Even-Point"],
-        "antwort": 1
-    },
-    # --- KAPITEL 5: Multivariate Funktionen ---
-    {
-        "frage": "Kapitel 5: Wie lautet die Lagrange-Funktion L?",
-        "optionen": ["L = f(x,y) + lambda * (g(x,y) - c)", "L = f(x,y) - lambda * (g(x,y) - c)", "L = f(x,y) * lambda", "L = g(x,y) - f(x,y)"],
-        "antwort": 1
-    },
-    {
-        "frage": "Kapitel 5: Wie bildest du die partielle Ableitung nach x (f'_x)?",
-        "optionen": ["Nach y ableiten, x ist konstant", "Nach x ableiten, y ist konstant", "Beide gleichzeitig ableiten", "x gleich 0 setzen"],
-        "antwort": 1
-    },
-    # --- KAPITEL 6: Folgen und Reihen ---
-    {
-        "frage": "Kapitel 6: Wie lautet das n-te Glied einer geometrischen Folge?",
-        "optionen": ["an = a1 + (n-1)d", "an = a1 * q^(n-1)", "an = a1 * q^n", "an = a1 + q^n"],
-        "antwort": 1
-    },
-    {
-        "frage": "Kapitel 6: Wann spricht man von einer 'vorschüssigen' Rente?",
-        "optionen": ["Zahlung am Ende der Periode", "Zahlung am Anfang der Periode", "Zahlung in der Mitte der Periode", "Wenn die Zinsen negativ sind"],
-        "antwort": 1
+# Helper class to match the user's snippet structure
+# It acts as a dict builder
+def Question(frage, optionen, antwort):
+    return {
+        "frage": frage,
+        "optionen": optionen,
+        "antwort": antwort
     }
+
+# --- Die erweiterte Fragen-Datenbank (30 Fragen) --- 
+FRAGEN_DB = [ 
+    # --- KAPITEL 1: Grundlagen (Mengen, Terme, Gleichungen) --- 
+    Question(
+        frage=r"Kapitel 1: Welche Zahlenmenge wird mit dem Symbol $\mathbb{Z}$ bezeichnet?", 
+        optionen=[r"Natürliche Zahlen ($\mathbb{N}$)", r"Ganze Zahlen ($\mathbb{Z}$)", r"Rationale Zahlen ($\mathbb{Q}$)", r"Reelle Zahlen ($\mathbb{R}$)"], 
+        antwort=1 
+    ), 
+    Question(
+        frage="Kapitel 1: Welche Form muss eine quadratische Gleichung haben, um die p-q-Formel anzuwenden?", 
+        optionen=[r"$ax^2 + bx + c = 0$", r"$x^2 + px + q = 0$", r"$a^2 + b^2 = c^2$", r"$y = mx + n$"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 1: Was ist das Ergebnis von $3^2 \cdot 3^3$?", 
+        optionen=[r"$3^6$", r"$3^5$", r"$9^5$", r"$9^6$"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 1: Wie wird die Menge aller x geschrieben, für die gilt: $2 < x \le 5$?", 
+        optionen=[r"$[2; 5]$", r"$]2; 5[$", r"$]2; 5]$", r"$[2; 5[$"], 
+        antwort=2 
+    ), 
+    Question(
+        frage=r"Kapitel 1: Was ist die Lösung der Gleichung $\sqrt{x+2} = 3$?", 
+        optionen=[r"$x = 7$", r"$x = 1$", r"$x = -1$", r"$x = 5$"], 
+        antwort=0 
+    ), 
+ 
+    # --- KAPITEL 2: Funktionen --- 
+    Question(
+        frage="Kapitel 2: Wie verhalten sich die Graphen einer Funktion und ihrer Umkehrfunktion zueinander?", 
+        optionen=["Punktsymmetrisch zum Ursprung", "Sie sind identisch", r"Spiegelsymmetrisch zur Geraden $y = x$", "Sie schneiden sich nie"], 
+        antwort=2 
+    ), 
+    Question(
+        frage=r"Kapitel 2: Was ergibt $\log(a \cdot b)$?", 
+        optionen=[r"$\log(a) \cdot \log(b)$", r"$\log(a) + \log(b)$", r"$\log(a) - \log(b)$", r"$b \cdot \log(a)$"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 2: Was ist der Definitionsbereich der Funktion $f(x) = \frac{1}{x-2}$?", 
+        optionen=[r"$\mathbb{R}$", r"$\mathbb{R} \setminus \{0\}$", r"$\mathbb{R} \setminus \{2\}$", r"$\mathbb{R} \setminus \{-2\}$"], 
+        antwort=2 
+    ), 
+    Question(
+        frage="Kapitel 2: Welche Funktion beschreibt exponentielles Wachstum?", 
+        optionen=[r"$f(x) = x^2$", r"$f(x) = 2 \cdot x + 5$", r"$f(x) = 5 \cdot 2^x$", r"$f(x) = \sin(x)$"], 
+        antwort=2 
+    ), 
+    Question(
+        frage=r"Kapitel 2: Wo liegt der Scheitelpunkt der Parabel $f(x) = (x-3)^2 + 1$?", 
+        optionen=[r"$S(3|1)$", r"$S(-3|1)$", r"$S(3|-1)$", r"$S(0|0)$"], 
+        antwort=0 
+    ), 
+ 
+    # --- KAPITEL 3: Differentialrechnung I --- 
+    Question(
+        frage=r"Kapitel 3: Wie lautet die Kettenregel für $f(x) = g(h(x))$?", 
+        optionen=[r"$f'(x) = g'(h(x)) \cdot h'(x)$", r"$f'(x) = g'(x) \cdot h'(x)$", r"$f'(x) = g'(h(x)) + h'(x)$", r"$f'(x) = g(h'(x))$"], 
+        antwort=0 
+    ), 
+    Question(
+        frage="Kapitel 3: Welche Bedingungen müssen für ein lokales Maximum bei $x_0$ erfüllt sein?", 
+        optionen=[r"$f'(x_0) = 0$ und $f''(x_0) > 0$", r"$f'(x_0) > 0$ und $f''(x_0) = 0$", r"$f'(x_0) = 0$ und $f''(x_0) < 0$", r"$f'(x_0) = 0$ und $f''(x_0) = 0$"], 
+        antwort=2 
+    ), 
+    Question(
+        frage=r"Kapitel 3: Was ist die Ableitung von $f(x) = e^{2x}$?", 
+        optionen=[r"$e^{2x}$", r"$2e^{2x}$", r"$2xe^{2x-1}$", r"$\frac{1}{2}e^{2x}$"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 3: Was gibt die zweite Ableitung $f''(x)$ anschaulich an?", 
+        optionen=["Die Steigung der Tangente", "Das Krümmungsverhalten", "Die Nullstellen", "Den Flächeninhalt"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 3: Wie lautet die Produktregel für $f(x) = u(x) \cdot v(x)$?", 
+        optionen=[r"$u' \cdot v + u \cdot v'$", r"$u' \cdot v - u \cdot v'$", r"$u' \cdot v'$", r"$\frac{u'v - uv'}{v^2}$"], 
+        antwort=0 
+    ), 
+ 
+    # --- KAPITEL 4: Ökonomische Anwendungen --- 
+    Question(
+        frage="Kapitel 4: Wann spricht man von einer unelastischen Nachfrage?", 
+        optionen=[r"Wenn $|\epsilon| > 1$", r"Wenn $|\epsilon| = 1$", r"Wenn $|\epsilon| < 1$", r"Wenn $\epsilon = 0$"], 
+        antwort=2 
+    ), 
+    Question(
+        frage=r"Kapitel 4: Was bedeutet 'Grenzkosten = Grenzerlöse' ($MC = MR$)?", 
+        optionen=["Kostenminimierung", "Gewinnmaximierung im Monopol", "Umsatzmaximierung", "Break-Even-Point"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 4: Was beschreibt die Kostenfunktion $K(x) = K_f + k_v \cdot x$?", 
+        optionen=["Lineare Gesamtkosten", "Quadratische Kosten", "Nur Fixkosten", "Degressive Kosten"], 
+        antwort=0 
+    ), 
+    Question(
+        frage="Kapitel 4: Was ist der Cournotsche Punkt?", 
+        optionen=["Der Schnittpunkt von Angebot und Nachfrage", "Der Punkt auf der Preis-Absatz-Funktion beim optimalen Preis", "Der Punkt minimaler Kosten", "Der Punkt, an dem der Gewinn 0 ist"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 4: Wie berechnet man den Gewinn $G(x)$?", 
+        optionen=[r"$G(x) = E(x) + K(x)$", r"$G(x) = E(x) - K(x)$", r"$G(x) = K(x) - E(x)$", r"$G(x) = E'(x)$"], 
+        antwort=1 
+    ), 
+ 
+    # --- KAPITEL 5: Multivariate Funktionen --- 
+    Question(
+        frage="Kapitel 5: Wie lautet die Lagrange-Funktion $L$?", 
+        optionen=[r"$L = f(x,y) + \lambda \cdot (g(x,y) - c)$", r"$L = f(x,y) - \lambda \cdot (g(x,y) - c)$", r"$L = f(x,y) \cdot \lambda$", r"$L = g(x,y) - f(x,y)$"], 
+        antwort=0 
+    ), 
+    Question(
+        frage=r"Kapitel 5: Wie bildest du die partielle Ableitung nach x ($f'_x$)?", 
+        optionen=[r"Nach $y$ ableiten, $x$ ist konstant", r"Nach $x$ ableiten, $y$ ist konstant", "Beide gleichzeitig ableiten", r"$x$ gleich 0 setzen"], 
+        antwort=1 
+    ), 
+    Question(
+        frage="Kapitel 5: Was beschreiben die Höhenlinien (Isoquanten) einer Produktionsfunktion?", 
+        optionen=["Orte gleicher Produktionsmenge", "Orte gleicher Kosten", "Den Gewinn", "Die Grenzkosten"], 
+        antwort=0 
+    ), 
+    Question(
+        frage="Kapitel 5: Wie viele Bedingungen erster Ordnung hat ein Lagrange-Ansatz mit 2 Variablen und 1 Nebenbedingung?", 
+        optionen=["1", "2", "3", "4"], 
+        antwort=2 
+    ), 
+    Question(
+        frage=r"Kapitel 5: Was muss für ein Minimum einer Funktion zweier Variablen gelten (Determinante der Hesse-Matrix $H_f$)?", 
+        optionen=[r"det($H_f$) > 0 und $f_{xx} > 0$", r"det($H_f$) < 0", r"det($H_f$) = 0", r"det($H_f$) > 0 und $f_{xx} < 0$"], 
+        antwort=0 
+    ), 
+ 
+    # --- KAPITEL 6: Folgen und Reihen --- 
+    Question(
+        frage="Kapitel 6: Wie lautet das n-te Glied einer geometrischen Folge?", 
+        optionen=[r"$a_n = a_1 + (n-1)d$", r"$a_n = a_1 \cdot q^{n-1}$", r"$a_n = a_1 \cdot q^n$", r"$a_n = a_1 + q^n$"], 
+        antwort=1 
+    ), 
+    Question(
+        frage="Kapitel 6: Wann spricht man von einer 'vorschüssigen' Rente?", 
+        optionen=["Zahlung am Ende der Periode", "Zahlung am Anfang der Periode", "Zahlung in der Mitte der Periode", "Wenn die Zinsen negativ sind"], 
+        antwort=1 
+    ), 
+    Question(
+        frage="Kapitel 6: Was ist der Barwert einer Zahlung?", 
+        optionen=["Der Wert der Zahlung in der Zukunft", "Der heutige Wert einer zukünftigen Zahlung", "Die Summe aller Zahlungen", "Der Zinssatz"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 6: Welche Reihe konvergiert für $|q| < 1$?", 
+        optionen=["Arithmetische Reihe", "Geometrische Reihe", "Harmonische Reihe", "Potenzreihe"], 
+        antwort=1 
+    ), 
+    Question(
+        frage=r"Kapitel 6: Wie berechnet man den Endwert $K_n$ bei Zinseszins?", 
+        optionen=[r"$K_n = K_0 \cdot (1 + i \cdot n)$", r"$K_n = K_0 \cdot (1+i)^n$", r"$K_n = K_0 \cdot q^{n-1}$", r"$K_n = K_0 + n \cdot i$"], 
+        antwort=1 
+    ) 
 ]
 
 # --- Funktionen für die Logik ---
@@ -106,7 +210,7 @@ if 'fragen_liste' not in st.session_state:
 if not st.session_state.quiz_aktiv:
     # STARTBILDSCHIRM
     st.title("🎓 IU Wirtschaftsmathe-Trainer")
-    st.write("Hallo Kiara! Bereit, dein Wissen aus den Skripten zu testen?")
+    st.write("Hallo Daniel! Bereit, dein Wissen aus den Skripten zu testen?")
     st.write("Klicke auf den Button, um zu starten.")
     
     if st.button("🚀 Quiz starten", type="primary"):
