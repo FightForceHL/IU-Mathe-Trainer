@@ -210,7 +210,7 @@ if 'fragen_liste' not in st.session_state:
 if not st.session_state.quiz_aktiv:
     # STARTBILDSCHIRM
     st.title("🎓 IU Wirtschaftsmathe-Trainer")
-    st.write("Hallo Daniel! Bereit, dein Wissen aus den Skripten zu testen?")
+    st.write("Hallo Kiara! Bereit, dein Wissen aus den Skripten zu testen?")
     st.write("Klicke auf den Button, um zu starten.")
     
     if st.button("🚀 Quiz starten", type="primary"):
