@@ -1,5 +1,7 @@
 import streamlit as st
 import random
+import matplotlib.pyplot as plt
+import numpy as np
 
 # --- Konfiguration der Seite ---
 st.set_page_config(page_title="IU Mathe-Trainer", page_icon="🎓")
@@ -184,20 +186,80 @@ def starte_spiel():
     st.session_state.quiz_aktiv = True
     st.session_state.score = 0
     st.session_state.aktueller_index = 0
+    # Hier merken wir uns die Stärken und Schwächen:
+    st.session_state.kapitel_stats = {} 
+    
     random.shuffle(st.session_state.fragen_liste)
     st.session_state.letzte_antwort_war_korrekt = None
 
 def antwort_checken(antwort_index):
-    # Prüfen ob richtig
     aktuelle_frage = st.session_state.fragen_liste[st.session_state.aktueller_index]
+    
+    # --- NEU: Kapitel erkennen und Statistik führen ---
+    # Wir holen uns das "Kapitel X" aus dem Fragetext (vor dem Doppelpunkt)
+    kapitel_name = aktuelle_frage["frage"].split(":")[0]
+    
+    # Falls das Kapitel noch nicht in der Liste ist, legen wir es an
+    if kapitel_name not in st.session_state.kapitel_stats:
+        st.session_state.kapitel_stats[kapitel_name] = {"richtig": 0, "gesamt": 0}
+    
+    # Wir zählen den Versuch
+    st.session_state.kapitel_stats[kapitel_name]["gesamt"] += 1
+    
+    # --- Ende Neuerungen Teil A ---
+
     if antwort_index == aktuelle_frage["antwort"]:
         st.session_state.score += 1
         st.session_state.letzte_antwort_war_korrekt = True
+        # --- NEU: Erfolg verbuchen ---
+        st.session_state.kapitel_stats[kapitel_name]["richtig"] += 1
     else:
         st.session_state.letzte_antwort_war_korrekt = False
     
-    # Weiter zur nächsten Frage
     st.session_state.aktueller_index += 1
+
+        # Weiter zur nächsten Frage
+    st.session_state.aktueller_index += 1
+        
+def zeige_visualisierung(frage_text):
+    # Wir erstellen einen "leeren Rahmen" für das Bild
+    fig, ax = plt.subplots()
+    
+    # --- KAPITEL 1: Quadratische Funktionen (Parabel) ---
+    if "quadratische Gleichung" in frage_text:
+        x = np.linspace(-4, 4, 100)
+        y = x**2
+        ax.plot(x, y, label='f(x) = x^2', color='blue')
+        ax.set_title("Beispiel: Normalparabel")
+        ax.grid(True)
+        ax.legend()
+    
+    # --- KAPITEL 4: Kostenfunktion ---
+    elif "Kostenfunktion" in frage_text or "Gewinn" in frage_text:
+        x = np.linspace(0, 10, 100)
+        K = 20 + 5 * x  # Fixkosten 20, variable Kosten 5
+        E = 8 * x       # Preis 8 pro Stück
+        ax.plot(x, K, label='Kosten K(x)', color='red')
+        ax.plot(x, E, label='Erlöse E(x)', color='green')
+        ax.set_title("Break-Even-Analyse")
+        ax.grid(True)
+        ax.legend()
+
+    # --- KAPITEL 6: Exponentielles Wachstum (Zinsen) ---
+    elif "Zins" in frage_text or "geometrische" in frage_text:
+        n = np.linspace(0, 10, 100)
+        Kn = 1000 * (1.05)**n # Startkapital 1000, 5% Zinsen
+        ax.plot(n, Kn, label='Kapitalentwicklung', color='purple')
+        ax.set_title("Zinseszinseffekt")
+        ax.grid(True)
+        ax.legend()
+        
+    else:
+        # Kein passendes Bild für diese Frage? Dann malen wir nichts.
+        return
+
+    # Das fertige Bild an Streamlit übergeben
+    st.pyplot(fig)
 
 # --- Initialisierung des "Gedächtnisses" (Session State) ---
 if 'quiz_aktiv' not in st.session_state:
@@ -222,18 +284,32 @@ else:
     
     # Prüfen, ob wir am Ende sind
     if st.session_state.aktueller_index >= len(st.session_state.fragen_liste):
-        st.title("🎉 Ergebnis")
+        st.title("🎉 Dein Ergebnis")
         st.write(f"Du hast **{st.session_state.score}** von **{len(st.session_state.fragen_liste)}** Punkten erreicht!")
         
+        # Gesamt-Fortschrittsbalken
         prozent = st.session_state.score / len(st.session_state.fragen_liste)
-        if prozent == 1.0:
-            st.balloons()
-            st.success("Perfekt! Du bist bereit für die Klausur! 🌟")
-        elif prozent >= 0.5:
-            st.info("Gute Arbeit! Ein bisschen Wiederholung schadet aber nicht.")
-        else:
-            st.warning("Da ist noch Luft nach oben. Schau dir die Skripte nochmal an!")
+        st.progress(prozent)
+        
+        st.markdown("---")
+        st.subheader("📊 Deine Stärken- & Schwächen-Analyse")
+        
+        # Wir gehen jedes Kapitel durch und zeigen das Ergebnis
+        for kapitel, stats in sorted(st.session_state.kapitel_stats.items()):
+            quote = stats["richtig"] / stats["gesamt"]
+            
+            # Farbe und Text je nach Leistung
+            if quote >= 0.8:
+                feedback = "🌟 Perfekt! Du bist bereit für die Klausur! 🌟"
+            elif quote >= 0.5:
+                feedback = "✅ Solide. Ein bisschen Wiederholung schadet aber nicht."
+            else:
+                feedback = "⚠️Kiara??? Hier besteht Wiederholungsbedarf!"
+                
+            st.write(f"**{kapitel}**: {stats['richtig']} von {stats['gesamt']} richtig ({int(quote*100)}%) -> {feedback}")
+            st.progress(quote)
 
+        st.markdown("---")
         if st.button("Nochmal spielen 🔄"):
             starte_spiel()
             st.rerun()
@@ -248,6 +324,7 @@ else:
         st.caption(f"Frage {st.session_state.aktueller_index + 1} von {len(st.session_state.fragen_liste)}")
 
         st.subheader(frage_data["frage"])
+        zeige_visualisierung(frage_data["frage"])
 
         # Feedback zur vorherigen Frage anzeigen (falls vorhanden)
         if st.session_state.letzte_antwort_war_korrekt is not None:
